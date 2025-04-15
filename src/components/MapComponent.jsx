@@ -147,7 +147,7 @@ function MapComponent() {
       <div
         style={{
           position: "absolute",
-          top: "10px",
+          top: "20px",
           left: "80px",
           zIndex: 1000,
           background: "rgba(255, 255, 255, 0.9)",
@@ -159,7 +159,7 @@ function MapComponent() {
       >
         <h3 style={{ margin: "0 0 8px 0" }}>🚗 Vehicle Movement Simulator</h3>
         <p style={{ margin: "4px 0" }}>
-          <b>Route:</b> Rishihood → Pacific Mall Sonipat
+          <b>Route:</b> Rishihood → Pacific Mall Delhi
         </p>
         <p style={{ margin: "4px 0" }}>
           <b>Data:</b> Simulated GPS coordinates
@@ -173,7 +173,7 @@ function MapComponent() {
       {/* Control Buttons */}
       <div style={{
         position: 'absolute',
-        top: '10px',
+        top: '20px',
         right: '10px',
         zIndex: 1000,
         display: 'flex',
