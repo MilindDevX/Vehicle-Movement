@@ -1,12 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup, Polyline, Tooltip } from 'react-leaflet';
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  Polyline,
+  Tooltip,
+} from "react-leaflet";
 import L from "leaflet";
 import { coordinates } from "../data/coordinates";
 import "leaflet/dist/leaflet.css";
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconRetina from "leaflet/dist/images/marker-icon-2x.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
-
+import { FaPlay, FaPause, FaRedo } from "react-icons/fa";
 // Icons
 import car from "../images/car.png";
 import start from "../images/start.png";
@@ -37,32 +44,38 @@ const endIcon = new L.Icon({
   iconSize: [25, 41],
 });
 function MapComponent() {
-  const [currentPosition, setCurrentPosition] = useState(0);
-  const [isMoving, setIsMoving] = useState(true);
-  const positions = coordinates.map((point) => [point.latitude, point.longitude]);
+  const [currentPosition, setCurrentPosition] = useState(0); // Current index of the vehicle
+  const [isMoving, setIsMoving] = useState(true); // Is the vehicle moving?
+  const [isPaused, setIsPaused] = useState(false); // Is the vehicle paused?
+  const positions = coordinates.map((point) => [point.latitude,point.longitude,]); // Convert coordinates to [lat, lng] format
 
+  // Start and end positions
   const startPosition = positions[0];
   const endPosition = positions[positions.length - 1];
 
+  // Pause and resume functionality
   useEffect(() => {
     let interval;
-    if (isMoving) {
+    if (isMoving && !isPaused) {
       interval = setInterval(() => {
         setCurrentPosition((prev) => {
-          if (prev + 1 >= positions.length - 1) {
+          if (prev >= positions.length - 1) {
             setIsMoving(false);
-            return positions.length - 1;
+            return prev;
           }
           return prev + 1;
         });
-      }, 2000);
+      }, 300);
     }
     return () => clearInterval(interval);
-  }, [isMoving, positions.length]);
+  }, [isMoving, isPaused, positions.length]);
+
+  const handlePlayPause = () => setIsPaused(!isPaused);
 
   const handleReset = () => {
     setCurrentPosition(0);
     setIsMoving(true);
+    setIsPaused(false);
   };
 
   return (
@@ -74,61 +87,83 @@ function MapComponent() {
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a>'
         />
         {/* Vehicle Marker */}
         <Marker position={positions[currentPosition]} icon={carIcon}>
-          <Popup>Vehicle</Popup>
+          <Popup permanent direction="top" offset={[0, -20]}>
+            <div style={{ textAlign: 'center', zIndex: 1000 }}>
+              Lat: {positions[currentPosition][0].toFixed(5)}<br />
+              Lng: {positions[currentPosition][1].toFixed(5)}
+            </div>
+          </Popup>
         </Marker>
 
         {/* Start Point Marker with Label */}
         <Marker position={startPosition} icon={startIcon}>
-          <Tooltip permanent direction="top" offset={[0, -10]}>
-            <div style={{ fontWeight: 'bold', color: 'green' }}>Rishihood University</div>
+          <Tooltip permanent direction="top" offset={[0, -27]}>
+            <div style={{ fontWeight: "bold", color: "green" }}>
+              Rishihood University
+            </div>
           </Tooltip>
-          <Popup>Rishihood University</Popup>
         </Marker>
-        
+
         {/* End Point Marker with Label */}
         <Marker position={endPosition} icon={endIcon}>
-          <Tooltip permanent direction="top" offset={[0, -10]}>
-            <div style={{ fontWeight: 'bold', color: 'red' }}>Pacific Mall Delhi</div>
+          <Tooltip permanent direction="bottom" offset={[0, 20]}>
+            <div style={{ fontWeight: "bold", color: "red" }}>
+              Pacific Mall Delhi
+            </div>
           </Tooltip>
-          <Popup>Pacific Mall Delhi</Popup>
         </Marker>
-        
+
         {/* Route Line */}
-        <Polyline 
-          positions={positions} 
-          color="blue"
-          weight={4}
-          opacity={0.7}
-        >
+        <Polyline positions={positions} color="blue" weight={4} opacity={0.7}>
           <Tooltip sticky>Route from Rishihood to Pacific Mall</Tooltip>
         </Polyline>
       </MapContainer>
 
       {/* Control Button */}
-      <button 
-        onClick={handleReset}
+      <div
         style={{
-          position: 'absolute',
-          top: '10px',
-          right: '10px',
+          position: "absolute",
+          top: "10px",
+          right: "10px",
+          display: "flex",
+          gap: "8px",
           zIndex: 1000,
-          padding: '8px 16px',
-          backgroundColor: '#4CAF50',
-          color: 'white',
-          border: 'none',
-          borderRadius: '4px',
-          cursor: 'pointer',
-          fontSize: '14px',
-          boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
         }}
       >
-        ↻ Reset Journey
-      </button>
-      
+        <button
+          onClick={handlePlayPause}
+          style={{
+            padding: "8px 12px",
+            background: "#fff",
+            border: "1px solid #ddd",
+            borderRadius: "4px",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+          }}
+        >
+          {isPaused ? <FaPlay size={14} /> : <FaPause size={14} />}
+        </button>
+        <button
+          onClick={handleReset}
+          style={{
+            padding: "8px 12px",
+            background: "#fff",
+            border: "1px solid #ddd",
+            borderRadius: "4px",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+          }}
+        >
+          <FaRedo size={14} />
+        </button>
+      </div>
     </div>
   );
 }
