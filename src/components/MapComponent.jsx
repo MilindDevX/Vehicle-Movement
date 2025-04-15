@@ -49,13 +49,11 @@ function MapComponent() {
     if (isMoving) {
       interval = setInterval(() => {
         setCurrentPosition((prev) => {
-          const nextPosition = prev + 1;
-          // Stop when reaching the end
-          if (nextPosition >= positions.length - 1) {
+          if (prev + 1 >= positions.length - 1) {
             setIsMoving(false);
             return positions.length - 1;
           }
-          return nextPosition;
+          return prev + 1;
         });
       }, 2000);
     }
@@ -96,7 +94,7 @@ function MapComponent() {
           <Tooltip permanent direction="top" offset={[0, -10]}>
             <div style={{ fontWeight: 'bold', color: 'red' }}>Pacific Mall Delhi</div>
           </Tooltip>
-          <Popup>Pacific Mall Sonipat</Popup>
+          <Popup>Pacific Mall Delhi</Popup>
         </Marker>
         
         {/* Route Line */}
@@ -109,7 +107,7 @@ function MapComponent() {
           <Tooltip sticky>Route from Rishihood to Pacific Mall</Tooltip>
         </Polyline>
       </MapContainer>
-      
+
       {/* Control Button */}
       <button 
         onClick={handleReset}
