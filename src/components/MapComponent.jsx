@@ -39,6 +39,7 @@ const endIcon = new L.Icon({
   iconUrl: end,
   iconSize: [25, 41],
 });
+
 function MapComponent() {
   // Css for buttons
   const buttonStyle = {
@@ -61,9 +62,9 @@ function MapComponent() {
   const [isPaused, setIsPaused] = useState(false);
   const [isTripComplete, setIsTripComplete] = useState(false);
   
-  const positions = coordinates.map((point) => [
-    point.latitude,
-    point.longitude,
+  const positions = coordinates.map((coords) => [
+    coords.latitude,
+    coords.longitude,
   ]); // Convert coordinates to [lat, lng] format
 
 
@@ -90,12 +91,12 @@ function MapComponent() {
   }, [isMoving, isPaused, positions.length]);
 
   // Button functionality
-  const handlePlayPause = () => {
+  function handlePlayPause(){
     if (isTripComplete) return;
     setIsPaused(!isPaused);
   };
 
-  const handleReset = () => {
+  function handleReset(){
     setCurrentPosition(0);
     setIsMoving(true);
     setIsPaused(false);
@@ -141,7 +142,7 @@ function MapComponent() {
         </Marker>
 
         {/* Route Line */}
-        <Polyline positions={positions} color={isTripComplete ? "green" : "blue"} weight={4} opacity={0.7}>
+        <Polyline positions={positions} color={"blue"} weight={4} opacity={0.7}>
           <Tooltip sticky>Route from Rishihood to Pacific Mall</Tooltip>
         </Polyline>
       </MapContainer>
