@@ -10,6 +10,8 @@ import icon from "leaflet/dist/images/marker-icon.png";
 import iconRetina from "leaflet/dist/images/marker-icon-2x.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 
+// Constants
+const totalTripTime = 70;
 // Icons
 import car from "../images/car.png";
 import start from "../images/start.png";
@@ -72,6 +74,18 @@ function MapComponent() {
   const startPosition = positions[0];
   const endPosition = positions[positions.length - 1];
   
+  // Time management
+  const calculateTimeRemaining = () => {
+    const progressPercentage = currentPosition / (positions.length - 1);
+    return Math.round(totalTripTime * (1 - progressPercentage));
+  };
+
+  // Format time as "Xh Ym"
+  const formatTime = (minutes) => {
+    const hrs = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hrs}h ${mins}m`;
+  };
 
   useEffect(() => {
     let interval;
@@ -85,7 +99,7 @@ function MapComponent() {
           }
           return newPosition;
         });
-      }, 300);
+      }, 50);
     }
     return () => clearInterval(interval);
   }, [isMoving, isPaused, positions.length]);
@@ -123,13 +137,18 @@ function MapComponent() {
 
         {/* Vehicle Marker */}
         <Marker position={positions[currentPosition]} icon={carIcon}>
-          <Popup permanent direction="top" offset={[0, -20]}>
-            <div style={{ textAlign: "center", zIndex: 1000 }}>
-              Lat: {positions[currentPosition][0].toFixed(5)}
-              <br />
-              Lng: {positions[currentPosition][1].toFixed(5)}
+          <Popup>
+            <div style={{ padding: '0px' }}>
+              <p><b>Coordinates:</b><br />
+                Lat: {positions[currentPosition][0].toFixed(5)}<br />
+                Lng: {positions[currentPosition][1].toFixed(5)}
+              </p>
             </div>
           </Popup>
+          
+          <Tooltip sticky>
+            Click for details
+          </Tooltip>
         </Marker>
 
         {/* End Point Marker */}
@@ -171,6 +190,8 @@ function MapComponent() {
         <p style={{ margin: "4px 0" }}>
           <b>Interval:</b> 0.3 seconds
         </p>
+        <p><b>Time Remaining:</b> {formatTime(calculateTimeRemaining())}</p>
+        <p><b>Total Trip Time:</b> 1h 10m</p>
       </div>
 
 
