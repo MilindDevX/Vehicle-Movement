@@ -91,15 +91,15 @@ function MapComponent() {
     let interval;
     if (isMoving && !isPaused) {
       interval = setInterval(() => {
-        setCurrentPosition(prev => {
-          const newPosition = prev >= positions.length - 1 ? prev : prev + 1;
+        setCurrentPosition(prevPosition => {
+          const newPosition = prevPosition >= positions.length - 1 ? prevPosition : prevPosition + 1;
           if (newPosition >= positions.length - 1) {
             setIsTripComplete(true);
             setIsMoving(false);
           }
           return newPosition;
         });
-      }, 50);
+      }, 100);
     }
     return () => clearInterval(interval);
   }, [isMoving, isPaused, positions.length]);
