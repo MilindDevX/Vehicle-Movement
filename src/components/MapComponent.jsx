@@ -40,6 +40,7 @@ const endIcon = new L.Icon({
   iconSize: [25, 41],
 });
 function MapComponent() {
+  // Css for buttons
   const buttonStyle = {
     padding: '8px 12px',
     background: '#fff',
@@ -54,41 +55,51 @@ function MapComponent() {
       background: '#f5f5f5'
     }
   };
+  // State variables
   const [currentPosition, setCurrentPosition] = useState(0); 
   const [isMoving, setIsMoving] = useState(true); 
   const [isPaused, setIsPaused] = useState(false);
+  const [isTripComplete, setIsTripComplete] = useState(false);
+  
   const positions = coordinates.map((point) => [
     point.latitude,
     point.longitude,
   ]); // Convert coordinates to [lat, lng] format
-  const isTripComplete = currentPosition >= positions.length - 1;
+
 
   // Start and end positions
   const startPosition = positions[0];
   const endPosition = positions[positions.length - 1];
   
-  // Pause and resume functionality
+
   useEffect(() => {
     let interval;
     if (isMoving && !isPaused) {
       interval = setInterval(() => {
-        setCurrentPosition((prev) =>
-          prev >= positions.length - 1 ? prev : prev + 1
-        );
+        setCurrentPosition(prev => {
+          const newPosition = prev >= positions.length - 1 ? prev : prev + 1;
+          if (newPosition >= positions.length - 1) {
+            setIsTripComplete(true);
+            setIsMoving(false);
+          }
+          return newPosition;
+        });
       }, 300);
     }
     return () => clearInterval(interval);
   }, [isMoving, isPaused, positions.length]);
 
+  // Button functionality
   const handlePlayPause = () => {
+    if (isTripComplete) return;
     setIsPaused(!isPaused);
-    if (isTripComplete) setIsMoving(false);
   };
 
   const handleReset = () => {
     setCurrentPosition(0);
     setIsMoving(true);
     setIsPaused(false);
+    setIsTripComplete(false);
   };
 
   return (
@@ -99,14 +110,6 @@ function MapComponent() {
         style={{ height: "100%", width: "100%" }}
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        
-        {/* Polyline for the route */}
-        <Polyline
-          positions={positions}
-          color={isTripComplete ? "green" : "blue"}
-          weight={4}
-          opacity={0.7}
-        />
 
         {/* Start Point Marker */}
         <Marker position={startPosition} icon={startIcon}>
@@ -138,7 +141,7 @@ function MapComponent() {
         </Marker>
 
         {/* Route Line */}
-        <Polyline positions={positions} color="blue" weight={4} opacity={0.7}>
+        <Polyline positions={positions} color={isTripComplete ? "green" : "blue"} weight={4} opacity={0.7}>
           <Tooltip sticky>Route from Rishihood to Pacific Mall</Tooltip>
         </Polyline>
       </MapContainer>
@@ -183,6 +186,7 @@ function MapComponent() {
         borderRadius: '8px',
         boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
       }}>
+        {/* Play/Pause Button */}
         <button 
           onClick={handlePlayPause}
           style={buttonStyle}
@@ -193,6 +197,7 @@ function MapComponent() {
             {isPaused ? 'Resume' : 'Pause'}
           </span>
         </button>
+        {/* Reset Button */}
         <button 
           onClick={handleReset}
           style={buttonStyle}
@@ -204,10 +209,10 @@ function MapComponent() {
       </div>
 
       {/* Trip Completion Alert */}
-      {isTripComplete && !isMoving && (
+      {isTripComplete && (
         <div style={{
           position: 'absolute',
-          bottom: '20px',
+          bottom: '40px',
           left: '50%',
           transform: 'translateX(-50%)',
           zIndex: 1000,
