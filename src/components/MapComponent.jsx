@@ -188,7 +188,7 @@ function MapComponent() {
           <b>Data:</b> Simulated GPS coordinates
         </p>
         <p style={{ margin: "4px 0" }}>
-          <b>Interval:</b> 0.3 seconds
+          <b>Interval:</b> 0.1 seconds
         </p>
         <p><b>Time Remaining:</b> {formatTime(calculateTimeRemaining())}</p>
         <p><b>Total Trip Time:</b> 1h 10m</p>
